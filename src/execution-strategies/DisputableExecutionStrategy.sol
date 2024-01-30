@@ -21,7 +21,7 @@ contract DisputableExecutionStrategy is SimpleQuorumExecutionStrategy, IArbitrab
     address public target;
     address public arbitrator;
     bytes public arbitratorExtraData;
-    uint256 public metaevidenceID;
+    uint256 public metaEvidenceID;
     uint256 public disputableDuration; // blocks from proposal.startBlockNumber
     mapping(uint256 => ProposalDispute) public disputeIDToDispute;
     mapping(uint256 => uint256) public proposalIDToDisputeID;
@@ -33,7 +33,7 @@ contract DisputableExecutionStrategy is SimpleQuorumExecutionStrategy, IArbitrab
     /// @param _quorum The quorum required to execute a proposal.
     /// @param _arbitrator The address of the arbitrator contract.
     /// @param _arbitratorExtraData The extra data used to raise a dispute in the arbitrator contract.
-    /// @param _metaevidence The metaevidence for the arbitrator contract.
+    /// @param _metaEvidence The meta-evidence for the arbitrator contract.
     /// @param _disputableDuration The number of blocks that a proposal is disputable for.
     constructor(
         address _owner,
@@ -42,7 +42,7 @@ contract DisputableExecutionStrategy is SimpleQuorumExecutionStrategy, IArbitrab
         uint256 _quorum,
         address _arbitrator,
         bytes memory _arbitratorExtraData,
-        string memory _metaevidence,
+        string memory _metaEvidence,
         uint256 _disputableDuration
     ) {
         bytes memory initParams = abi.encode(
@@ -52,7 +52,7 @@ contract DisputableExecutionStrategy is SimpleQuorumExecutionStrategy, IArbitrab
             _quorum,
             _arbitrator,
             _arbitratorExtraData,
-            _metaevidence,
+            _metaEvidence,
             _disputableDuration
         );
         setUp(initParams);
@@ -68,7 +68,7 @@ contract DisputableExecutionStrategy is SimpleQuorumExecutionStrategy, IArbitrab
             uint256 _quorum,
             address _arbitrator,
             bytes memory _arbitratorExtraData,
-            string memory _metaevidence,
+            string memory _metaEvidence,
             uint256 _disputableDuration
         ) = abi.decode(initParams, (address, address, address[], uint256, address, bytes, string, uint256));
         __Ownable_init();
@@ -79,18 +79,18 @@ contract DisputableExecutionStrategy is SimpleQuorumExecutionStrategy, IArbitrab
         arbitrator = _arbitrator;
         arbitratorExtraData = _arbitratorExtraData;
         disputableDuration = _disputableDuration;
-        emit MetaEvidence(metaevidenceID, _metaevidence);
+        emit MetaEvidence(metaEvidenceID, _metaEvidence);
     }
 
-    function setMetaEvidence(string calldata _metaevidence) external onlyOwner {
-        emit MetaEvidence(++metaevidenceID, _metaevidence);
+    function setMetaEvidence(string calldata _metaEvidence) external onlyOwner {
+        emit MetaEvidence(++metaEvidenceID, _metaEvidence);
     }
 
     function createDispute(uint256 _proposalId) external payable {
         uint256 disputeID = IArbitratorV1(arbitrator).createDispute{ value: msg.value }(2, arbitratorExtraData);
         disputeIDToDispute[_proposalId] = ProposalDispute({ proposalId: _proposalId, ruling: 0, disputed: true });
         proposalIDToDisputeID[_proposalId] = disputeID;
-        emit Dispute(arbitrator, disputeID, metaevidenceID, _proposalId);
+        emit Dispute(arbitrator, disputeID, metaEvidenceID, _proposalId);
     }
 
     function submitEvidence(string memory _evidence, uint256 _proposalID) external {
